@@ -17,6 +17,7 @@ metadata:
   author: oigarash
   version: "0.1.0"
   repository: https://github.com/oigarash/agent-skills
+  path: skills/skill-feedback
 ---
 
 # Skill Feedback
@@ -104,8 +105,11 @@ If generic, continue to Step 4. If env-specific, jump to Step 6.
 Try these in order and stop at the first success. If all fail, the skill has no upstream →
 degrade to Step 6 (local patch) and tell the user.
 
-1. **SKILL.md frontmatter `metadata.repository`**. Preferred. Also check common aliases:
-   `repository`, `repo`, `upstream`, `source`.
+1. **SKILL.md frontmatter `metadata.repository`**. Preferred. Also check common aliases
+   (`repository`, `repo`, `upstream`, `source`). If `metadata.path` is present, the skill
+   lives in a subdirectory of a monorepo — keep that path handy; you'll use it in the Issue
+   title prefix (e.g. `[skill: skills/<name>] …`) and mention it in the body so the
+   maintainer can locate the file without grepping.
 2. **`git remote -v` from the skill directory.** Run at the resolved path, not the symlink:
    ```bash
    git -C "$(readlink -f ~/.claude/skills/<name>)" remote -v 2>/dev/null

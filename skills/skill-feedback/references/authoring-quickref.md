@@ -35,6 +35,7 @@ metadata:                          # optional but recommended
   author: <name or handle>
   version: "0.1.0"
   repository: <url>                # optional; enables upstream feedback routing
+  path: skills/<name>              # optional; subpath inside the repo (set for monorepos)
 ---
 ```
 

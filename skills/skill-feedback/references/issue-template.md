@@ -10,6 +10,10 @@ respect it.
 
 Example: `[skill: webex-cli] description never triggers on 「Webex スペース一覧」`
 
+If the skill lives in a monorepo (i.e. SKILL.md declares `metadata.path`), prefix with the
+subpath so the maintainer can jump straight to the file:
+`[skill: skills/webex-cli] …`.
+
 ## Body
 
 ```markdown
