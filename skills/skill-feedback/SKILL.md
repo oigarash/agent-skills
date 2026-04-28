@@ -10,12 +10,12 @@ description: |
   session that a skill misled you, lacked a needed step, referenced a wrong path, fought with
   tool output, or its description did/did-not trigger when it should have — surface this skill
   and offer to capture the finding. It also covers deciding whether a finding is generic
-  (upstream) or env-specific (local), locating the upstream repo from SKILL.md metadata or
-  `git remote`, and filing via `glab` / `gh` from a pre-written template with dry-run and
-  duplicate checks.
+  (upstream) or env-specific (local), locating the upstream repo from SKILL.md metadata
+  (asking the user when it's missing), and filing via `glab` / `gh` from a pre-written
+  template with dry-run and duplicate checks.
 metadata:
   author: oigarash
-  version: "0.1.0"
+  version: "0.1.1"
   repository: https://github.com/oigarash/agent-skills
   path: skills/skill-feedback
 ---
@@ -102,21 +102,23 @@ If generic, continue to Step 4. If env-specific, jump to Step 6.
 
 ### Step 4. Locate the upstream repository
 
-Try these in order and stop at the first success. If all fail, the skill has no upstream →
-degrade to Step 6 (local patch) and tell the user.
+Try these in order and stop at the first success. If both fail, the skill has no known
+upstream → degrade to Step 6 (local patch) and tell the user.
 
 1. **SKILL.md frontmatter `metadata.repository`**. Preferred. Also check common aliases
    (`repository`, `repo`, `upstream`, `source`). If `metadata.path` is present, the skill
    lives in a subdirectory of a monorepo — keep that path handy; you'll use it in the Issue
    title prefix (e.g. `[skill: skills/<name>] …`) and mention it in the body so the
    maintainer can locate the file without grepping.
-2. **`git remote -v` from the skill directory.** Run at the resolved path, not the symlink:
-   ```bash
-   git -C "$(readlink -f ~/.claude/skills/<name>)" remote -v 2>/dev/null
-   ```
-   If it's a git repo, pick `origin` (or `upstream` if present) and take its URL.
-3. **Ask the user.** Verbatim: "このスキルの upstream リポジトリを教えてください（無ければ
+2. **Ask the user.** Verbatim: "このスキルの upstream リポジトリを教えてください（無ければ
    ローカル SKILL.md の修正提案に切り替えます）。"
+
+Do **not** infer the upstream from `git remote` of the skill directory. Skills installed
+via `npx skills` (or any out-of-tree installer) often live under a directory whose nearest
+`.git` belongs to an unrelated repo (e.g., `~/.claude/` itself, or whichever project the
+user happens to keep their dotfiles in). Picking that remote risks filing the Issue against
+the wrong repository — and Issue creation is an externally-visible, hard-to-undo action.
+Always ask instead.
 
 Normalize whatever you find to `host + owner/repo`. Host decides the CLI:
 - `github.com` → `gh`
