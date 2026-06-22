@@ -8,3 +8,4 @@ For the behavior, triggers, and usage of any individual skill, see that skill's 
 ## Skills
 
 - [skill-feedback](skills/skill-feedback/SKILL.md) — Skill 使用時に気づいた改善点を Issue/PR/ローカル patch に振り分ける
+- [cmux](skills/cmux/SKILL.md) — cmux のトポロジ／ルーティング制御（window/workspace/pane/surface の inspect・focus・move・reorder）
