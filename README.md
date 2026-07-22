@@ -7,6 +7,7 @@ For the behavior, triggers, and usage of any individual skill, see that skill's 
 
 ## Skills
 
+- [agent-skill-install](skills/agent-skill-install/SKILL.md) — グローバル Agent Skill の導入・整理ルール（正本は home repo、グローバルには npx 管理か symlink で参照を置き実体を置かない／作成先の振り分け／監査）
 - [cmux](skills/cmux/SKILL.md) — cmux のトポロジ／ルーティング制御（window/workspace/pane/surface の inspect・focus・move・reorder）
 - [customize-claude-code](skills/customize-claude-code/SKILL.md) — Claude Code カスタマイズの実践リファレンス（hooks / settings.json / CLAUDE.md / シェルスクリプトの罠）
 - [cxj-dify-maintenance](skills/cxj-dify-maintenance/SKILL.md) — cxj-dify プラットフォームの運用保守・Admin API 管理（鍵ローテーション／ヘルスチェック／LLMプロバイダ設定／プラグイン管理）
