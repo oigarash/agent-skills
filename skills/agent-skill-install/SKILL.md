@@ -44,9 +44,27 @@ exists to prevent. An npx-managed body is a copy too, but it is allowed because 
 `npx skills update` re-fetches it. A symlink is preferred when you want edits in the home repo to
 show up with zero extra steps.
 
-Prefer **npx** when the home repo has a clone-able git URL (it stays updatable and portable to a
-fresh machine). Fall back to a **symlink** when npx would force a redundant re-clone of something
-you already have as part of a larger checkout, or the source is a local/private path.
+### npx `add` always materializes a *copy* here — know what its symlink mode does
+
+`npx skills add` defaults to symlink mode, but understand what it links: it symlinks each AI CLI's
+skills dir to a single shared **universal store** (`~/.agents/skills`), so all tools share one body
+— it does **not** symlink to your home-repo checkout under `~/ghq`. And in this setup every CLI
+skills dir (`~/.claude`, `~/.agents`, `~/.codex`, `~/.cursor`) is already a whole-directory symlink
+to the one source (`~/mac_setup/ai-unified-config/skills`), so npx's per-CLI symlink target and
+destination resolve to the *same* path; the self-symlink fails and npx falls back to copying
+(`✓ … (copied)`). Either way, **an npx install leaves a managed copy of the body in the source
+directory** — which is fine (it is `npx skills update`-able and portable), but it is a copy, not a
+link to your checkout.
+
+**Choosing between the two forms:**
+
+- Use **npx** for someone else's registry/public skill, or when you want a self-contained,
+  `npx skills update`-able body and don't mind re-running update to pull edits. Portable to a fresh
+  machine without the home repo present.
+- Use a **manual symlink** for a skill you actively iterate on and already have checked out
+  (this repo, or a tool's repo) — edits in the home repo show up instantly with zero extra steps
+  and there is no second copy to drift. This is what `skill-feedback` and the tool skills use. The
+  only cost: the target checkout must exist on disk (fine on your machine; clone it on a new one).
 
 ## Where a skill's source of truth should live (author here)
 
@@ -70,9 +88,10 @@ loose copy into the global directory.
 
 ## Procedures
 
-### Install a skill globally via npx (preferred)
+### Install a managed copy via npx
 
-The skill must be pushed to its home repo first (npx fetches from the remote).
+The skill must be pushed to its home repo first (npx fetches from the remote). This leaves an
+`npx skills update`-able copy in the source directory (see the note above on why it copies here).
 
 ```bash
 # From a git URL (note the trailing .git). -g = global.
@@ -85,12 +104,15 @@ npx skills add -g git@gitlab-cxj.cisco.com:oigarash/agent-skills.git --skill <na
 Because the per-tool dirs are one symlinked source, a single global install covers every tool.
 Passing a plain HTTPS repo *page* (without `.git`) makes npx look for a
 `/.well-known/agent-skills/index.json` endpoint and fail with "No skills found" — always use the
-git URL form. Update with `npx skills update <name>`, remove with `npx skills remove <name>`.
+git URL form. Update with `npx skills update <name>`, remove with `npx skills remove <name>`
+(note: `remove` only finds skills npx still tracks; a stale copy may need `rm -rf` in the source dir).
 
-### Install via symlink (fallback)
+### Link the home-repo checkout via a manual symlink
 
-Use when the skill already exists in a local checkout (a tool's repo, `~/ghq/...`, `~/work/...`)
-and npx would just re-clone it. Symlink the home-repo copy into the source directory:
+Use when the skill already exists in a local checkout (this repo, a tool's repo, `~/ghq/...`,
+`~/work/...`) and you want edits to reflect instantly with no second copy. `npx` cannot produce
+this link in our setup (it targets the universal store, not `~/ghq`, and falls back to copy), so
+create the symlink directly — point the source directory at the home-repo copy:
 
 ```bash
 SRC="$HOME/mac_setup/ai-unified-config/skills"
@@ -147,9 +169,10 @@ Need a skill available globally?
 │
 └─ Is it your own general/Cisco skill?
      ├─ author it in oigarash/agent-skills (github = personal, gitlab-cxj = Cisco)
-     ├─ push it
-     └─ npx skills add -g <that repo .git> --skill <name>       (preferred)
-          └─ or symlink if you already have the checkout and don't want a re-clone
+     ├─ push it, then choose:
+     ├─ iterating on it / already checked out → manual symlink to the ~/ghq checkout (zero drift)
+     └─ want a portable, npx-updatable copy → npx skills add -g <that repo .git> --skill <name>
 
-In every branch: the source directory gets a reference, never a hand-copied body.
+In every branch: the source directory only ever holds an npx-managed copy or a symlink —
+never an untracked, hand-copied body.
 ```
