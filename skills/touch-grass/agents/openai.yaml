@@ -1,0 +1,5 @@
+interface:
+  display_name: "Touch Grass"
+  short_description: "Keep planning grounded and decision-focused"
+policy:
+  allow_implicit_invocation: false
