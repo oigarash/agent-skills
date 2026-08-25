@@ -1,0 +1,5 @@
+interface:
+  display_name: "Skip Side Quests"
+  short_description: "Keep implementation on the agreed outcome"
+policy:
+  allow_implicit_invocation: false
